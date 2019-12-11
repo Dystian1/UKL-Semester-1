@@ -14,10 +14,10 @@ class PelanggaranController extends Controller
 
         foreach (Pelanggaran::take($limit)->skip($offset)->get() as $p) {
             $item = [
-                "id"    => $p->id,
-                "nama_pelanggaran"    => $p->nama_pelanggaran,
-                "kategori"    => $p->kategori,
-                "poin"    => $p->poin,
+                "id"                => $p->id,
+                "nama_pelanggaran"  => $p->nama_pelanggaran,
+                "kategori"          => $p->kategori,
+                "poin"              => $p->poin,
             ];
             array_push($pelanggaran, $item);
         }
@@ -33,7 +33,10 @@ class PelanggaranController extends Controller
             'poin' => $request->poin,
         ]);
         $pelanggaran->save();
-        return response($pelanggaran);
+        return response()->json([
+            'status' => '1',
+            'message'=> 'Data Pelanggaran Berhasil ditambahkan'
+        ]);;
     }
     public function show($id)
     {
@@ -61,7 +64,10 @@ class PelanggaranController extends Controller
         $pelanggaran->updated_at         = now()->timestamp;
 
         $pelanggaran->save();
-        return response($pelanggaran);
+        return response()->json([
+            'status' => '1',
+            'message'=> 'Data Pelanggaran Berhasil diubah'
+        ]);;
     }
     public function destroy($id)
     {
@@ -70,7 +76,7 @@ class PelanggaranController extends Controller
 
         return response()->json([
             'status' => '1',
-            'message'=> 'Delete Data Berhasil'
+            'message'=> 'Data Pelanggaran Berhasil dihapus'
         ]);
     }
 }

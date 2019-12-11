@@ -59,10 +59,58 @@ class UserController extends Controller
             $token = JWTAuth::fromUser($user);
             return response()->json([
                 'status'	=> '1',
-                'message'	=> 'User berhasil terregistrasi'
+                'message'	=> 'Petugas berhasil ditambahkan'
             ], 201);
-    }
-    
+	}
+	public function index($limit = 10, $offset = 0)
+	{
+		$data["count"] = User::count();
+		$user = array();
+		foreach (User::take($limit)->skip($offset)->get() as $p) {
+			$item = [
+				"id"            => $p->id,
+				"name"  		=> $p->name,
+				"role"          => $p->role,
+				"email"         => $p->email,
+				"created_at"    => $p->created_at,
+				"updated_at"    => $p->updated_at,
+			];
+
+			array_push($user, $item);
+		}
+		$data["User"] = $user;
+		$data["status"] = 1;
+		return response($data);
+	}
+	public function update(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'name' => 'required|string|max:255',
+			'email' => 'required|string|email|max:255|unique:users',
+			'password' => 'required|string|min:6',
+            'role'     => 'required|in:admin,petugas',
+		]);
+
+		if($validator->fails()){
+			return response()->json([
+				'status'	=> '0',
+				'message'	=> $validator->errors()
+			]);
+		}
+
+		//proses update data
+		$user = User::where('id', $request->id)->first();
+		$user->name 	= $request->name;
+		$user->email 	= $request->email;
+		$user->password = Hash::make($request->password);
+		$user->save();
+
+
+		return response()->json([
+			'status'	=> '1',
+			'message'	=> 'Petugas berhasil diubah'
+		], 201);
+	}
     public function getAuthenticatedUser(){
 		try {
 			if(!$user = JWTAuth::parseToken()->authenticate()){
@@ -90,7 +138,24 @@ class UserController extends Controller
 
 		 return response()->json([
 		 		"auth"      => true,
-                "user"    => $user
+                "user"    	=> $user
 		 ], 201);
 	}
+	public function delete($id)
+    {
+        try{
+
+            User::where("id", $id)->delete();
+
+            return response([
+            	"status"	=> 1,
+                "message"   => "Data berhasil dihapus."
+            ]);
+        } catch(\Exception $e){
+            return response([
+            	"status"	=> 0,
+                "message"   => $e->getMessage()
+            ]);
+        }
+    }
 }

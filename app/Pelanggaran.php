@@ -13,7 +13,7 @@ class Pelanggaran extends Model
       'poin',
     ];
 
-    public function poin_siswa(){
+    public function poin_siswas(){
     return $this->hasMany('App\Poin_Siswa', 'id_pelanggaran', 'id');
     }
 }
